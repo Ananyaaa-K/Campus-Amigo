@@ -32,7 +32,9 @@ model Meal {
   price      String // ₹, ₹₹, ₹₹₹
   status     String // Open Now, Closed
   imageClass String? // e.g. bg-orange-100 (for demo visual)
+  imageUrl   String? // Image URL for the meal spot
   menuItems  String // JSON string or comma separated for simplicity
+  itemPrices String? // Prices for menu items (comma separated, matching menuItems order)
   createdAt  DateTime @default(now())
 
   suggestedBy User?   @relation("SuggestedMeals", fields: [userId], references: [id])

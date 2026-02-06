@@ -23,8 +23,10 @@ async function main() {
             distance: "On Campus",
             price: "₹",
             imageClass: "bg-orange-100",
+            imageUrl: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&h=600&fit=crop",
             status: "Open Now",
             menuItems: "Chole Bhature, Masala Dosa, Filter Coffee",
+            itemPrices: "₹50, ₹40, ₹20",
             userId: user.id
         },
         {
@@ -34,8 +36,10 @@ async function main() {
             distance: "0.2 km",
             price: "₹₹",
             imageClass: "bg-red-100",
+            imageUrl: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&h=600&fit=crop",
             status: "Open Now",
             menuItems: "Hakka Noodles, Momos, Chilli Potato",
+            itemPrices: "₹80, ₹60, ₹70",
             userId: user.id
         },
         {
@@ -45,8 +49,10 @@ async function main() {
             distance: "0.5 km",
             price: "₹₹",
             imageClass: "bg-yellow-100",
+            imageUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=600&fit=crop",
             status: "Closes in 30m",
             menuItems: "Crispy Chicken Burger, Oreo Shake, Fries",
+            itemPrices: "₹120, ₹90, ₹50",
             userId: user.id // Just relating for demo
         }
     ]

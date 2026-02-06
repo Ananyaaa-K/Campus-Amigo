@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Coffee, MapPin, Star, Clock } from "lucide-react"
 import { db } from "@/lib/db"
 import { SuggestModalWrapper } from "@/components/modals/SuggestModalWrapper"
+import Image from "next/image"
 
 import SearchInput from "@/components/SearchInput"
 import { FilterComponent } from "@/components/FilterComponent"
@@ -93,48 +94,67 @@ export default async function MealsPage(props: {
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {meals.length > 0 ? (
-                    meals.map((meal: any) => (
-                        <Card key={meal.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                            <div className={`h-48 w-full ${meal.imageClass || 'bg-slate-200'} relative`}>
-                                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-bold text-slate-800">
-                                    {meal.status}
-                                </div>
-                            </div>
-                            <CardHeader className="pb-2">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <CardTitle className="text-xl mb-1">{meal.name}</CardTitle>
-                                        <CardDescription>{meal.cuisine}</CardDescription>
-                                    </div>
-                                    <div className="flex items-center gap-1 bg-green-50 text-green-700 px-2 py-1 rounded-lg dark:bg-green-900/30 dark:text-green-400">
-                                        <Star className="h-3 w-3 fill-current" />
-                                        <span className="text-sm font-bold">{meal.rating}</span>
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="flex items-center gap-4 text-sm text-slate-600 mb-4 dark:text-slate-400">
-                                    <div className="flex items-center gap-1">
-                                        <MapPin className="h-4 w-4" />
-                                        {meal.distance}
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <span className="font-bold text-slate-900 dark:text-slate-200">{meal.price}</span>
+                    meals.map((meal: any) => {
+                        const menuItemsArray = meal.menuItems.split(',').map((item: string) => item.trim())
+                        const itemPricesArray = meal.itemPrices ? meal.itemPrices.split(',').map((price: string) => price.trim()) : []
+                        
+                        return (
+                            <Card key={meal.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                                <div className="h-48 w-full relative">
+                                    {meal.imageUrl ? (
+                                        <Image 
+                                            src={meal.imageUrl} 
+                                            alt={meal.name}
+                                            fill
+                                            className="object-cover"
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                        />
+                                    ) : (
+                                        <div className={`h-full w-full ${meal.imageClass || 'bg-slate-200'}`} />
+                                    )}
+                                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-bold text-slate-800">
+                                        {meal.status}
                                     </div>
                                 </div>
-                                <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                                    <p className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wider">Popular Items</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {meal.menuItems.split(',').map((item: any, i: any) => (
-                                            <span key={i} className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded-full dark:bg-slate-800 dark:text-slate-300">
-                                                {item.trim()}
-                                            </span>
-                                        ))}
+                                <CardHeader className="pb-2">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <CardTitle className="text-xl mb-1">{meal.name}</CardTitle>
+                                            <CardDescription>{meal.cuisine}</CardDescription>
+                                        </div>
+                                        <div className="flex items-center gap-1 bg-green-50 text-green-700 px-2 py-1 rounded-lg dark:bg-green-900/30 dark:text-green-400">
+                                            <Star className="h-3 w-3 fill-current" />
+                                            <span className="text-sm font-bold">{meal.rating}</span>
+                                        </div>
                                     </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex items-center gap-4 text-sm text-slate-600 mb-4 dark:text-slate-400">
+                                        <div className="flex items-center gap-1">
+                                            <MapPin className="h-4 w-4" />
+                                            {meal.distance}
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <span className="font-bold text-slate-900 dark:text-slate-200">{meal.price}</span>
+                                        </div>
+                                    </div>
+                                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                                        <p className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wider">Popular Items</p>
+                                        <div className="flex flex-col gap-2">
+                                            {menuItemsArray.map((item: string, i: number) => (
+                                                <div key={i} className="flex justify-between items-center text-sm">
+                                                    <span className="text-slate-700 dark:text-slate-300">{item}</span>
+                                                    {itemPricesArray[i] && (
+                                                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">{itemPricesArray[i]}</span>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )
+                    })
                 ) : (
                     <div className="col-span-full text-center py-12 text-slate-500">
                         <p>No meals found matching your criteria.</p>
