@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  role      String   @default("student") // student, admin
+  karma     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  // Relations
+  notes Note[]
+  meals Meal[] @relation("SuggestedMeals")
+}
+
+model Meal {
+  id         Int      @id @default(autoincrement())
+  name       String
+  cuisine    String
+  rating     Float    @default(0.0)
+  distance   String
+  price      String // ₹, ₹₹, ₹₹₹
+  status     String // Open Now, Closed
+  imageClass String? // e.g. bg-orange-100 (for demo visual)
+  menuItems  String // JSON string or comma separated for simplicity
+  createdAt  DateTime @default(now())
+
+  suggestedBy User?   @relation("SuggestedMeals", fields: [userId], references: [id])
+  userId      String?
+}
+
+model Note {
+  id            Int      @id @default(autoincrement())
+  title         String
+  subject       String
+  displayAuthor String? // For manual overrides or external
+  semester      String
+  downloads     Int      @default(0)
+  size          String
+  fileType      String // PDF, DOCX
+  fileUrl       String? // Optional for now (demo)
+  createdAt     DateTime @default(now())
+
+  uploadedBy User?   @relation(fields: [userId], references: [id])
+  userId     String?
+}
+
+model Pyq {
+  id        Int      @id @default(autoincrement())
+  year      String
+  subject   String
+  semester  String   @default("General") // 1st Semester, 2nd Semester, etc.
+  fileUrl   String?
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id           Int      @id @default(autoincrement())
+  title        String
+  date         String
+  location     String
+  category     String // Tech, Cultural, Sports
+  description  String?
+  participants String? // e.g. "200+ registered"
+  createdAt    DateTime @default(now())
+}
