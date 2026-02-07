@@ -304,7 +304,6 @@ export async function createQuery(formData: FormData) {
             }
         })
 
-        revalidatePath("/student-portal")
         revalidatePath("/admin")
         return { success: true, message: "Query posted successfully!" }
     } catch (error) {
@@ -341,7 +340,6 @@ export async function createReply(formData: FormData) {
             data: { status: "answered" }
         })
 
-        revalidatePath("/student-portal")
         revalidatePath("/admin")
         return { success: true, message: "Reply posted successfully!" }
     } catch (error) {

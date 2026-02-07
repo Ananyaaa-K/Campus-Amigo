@@ -13,7 +13,6 @@ const navItems = [
     { name: "Notes", href: "/notes", icon: BookOpen },
     { name: "PYQs", href: "/pyqs", icon: FileText },
     { name: "Events", href: "/events", icon: Calendar },
-    { name: "Student Portal", href: "/student-portal", icon: Coffee },
 ]
 
 import { logout } from "@/app/actions"
