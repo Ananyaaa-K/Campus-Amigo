@@ -354,16 +354,70 @@ export async function submitQuery(formData: FormData) {
         const title = formData.get("title") as string
         const content = formData.get("content") as string
 
+        // Real Auth
+        const user = await getCurrentUser()
+
         await db.query.create({
             data: {
                 title,
-                content
+                content,
+                authorId: user?.id
             }
         })
+
+        if (user) {
+            await db.user.update({
+                where: { id: user.id },
+                data: { karma: { increment: 5 } }
+            })
+        }
 
         return { success: true, message: "Query submitted successfully!" }
     } catch (error) {
         console.error("Error submitting query:", error)
         return { success: false, message: "Failed to submit query." }
+    }
+}
+
+export async function createReply(formData: FormData) {
+    try {
+        const queryId = parseInt(formData.get("queryId") as string)
+        const content = formData.get("content") as string
+
+        // Real Auth
+        const user = await getCurrentUser()
+        if (!user) {
+            return { success: false, message: "You must be logged in to reply." }
+        }
+
+        if (!content) {
+            return { success: false, message: "Content is required" }
+        }
+
+        await db.reply.create({
+            data: {
+                content,
+                queryId,
+                authorId: user.id
+            }
+        })
+
+        // Update query status to answered
+        await db.query.update({
+            where: { id: queryId },
+            data: { status: "answered" }
+        })
+
+        // Award karma to the replier
+        await db.user.update({
+            where: { id: user.id },
+            data: { karma: { increment: 10 } }
+        })
+
+        revalidatePath("/admin")
+        return { success: true, message: "Reply sent successfully!" }
+    } catch (error) {
+        console.error("Error creating reply:", error)
+        return { success: false, message: "Failed to send reply." }
     }
 }

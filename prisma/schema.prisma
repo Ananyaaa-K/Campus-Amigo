@@ -25,6 +25,8 @@ model User {
   lostItems LostItem[]
   posts     Post[]
   reviews   Review[]
+  queries   Query[]
+  replies   Reply[]
 }
 
 model Meal {
@@ -138,5 +140,23 @@ model Query {
   id        Int      @id @default(autoincrement())
   title     String
   content   String
+  status    String   @default("pending") // pending, answered
   createdAt DateTime @default(now())
+
+  author   User?   @relation(fields: [authorId], references: [id])
+  authorId String?
+  
+  replies  Reply[]
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+
+  query   Query @relation(fields: [queryId], references: [id])
+  queryId Int
+
+  author   User?   @relation(fields: [authorId], references: [id])
+  authorId String?
 }
