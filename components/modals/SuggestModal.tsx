@@ -93,6 +93,29 @@ export function SuggestModal({ isOpen, onClose }: SuggestModalProps) {
                             </div>
                         </div>
 
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-500">Latitude (Opt)</label>
+                                <input
+                                    name="latitude"
+                                    type="number"
+                                    step="any"
+                                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-950 dark:border-slate-800"
+                                    placeholder="e.g. 28.54"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-500">Longitude (Opt)</label>
+                                <input
+                                    name="longitude"
+                                    type="number"
+                                    step="any"
+                                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-950 dark:border-slate-800"
+                                    placeholder="e.g. 77.27"
+                                />
+                            </div>
+                        </div>
+
                         <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white" disabled={isLoading}>
                             {isLoading ? "Submitting..." : "Submit Suggestion"}
                         </Button>

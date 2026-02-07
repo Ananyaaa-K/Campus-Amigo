@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Coffee, MapPin, Star, Clock } from "lucide-react"
 import { db } from "@/lib/db"
 import { SuggestModalWrapper } from "@/components/modals/SuggestModalWrapper"
-import Image from "next/image"
+import LeafletMapWrapper from "@/components/LeafletMapWrapper"
+import { ReviewModal } from "@/components/modals/ReviewModal"
 
 import SearchInput from "@/components/SearchInput"
 import { FilterComponent } from "@/components/FilterComponent"
@@ -46,11 +47,14 @@ export default async function MealsPage(props: {
     try {
         meals = await db.meal.findMany({
             where,
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' },
+            include: {}
         })
     } catch (error) {
         console.error("Failed to fetch meals:", error)
     }
+
+
 
     return (
         <div className="container mx-auto px-4 py-8 md:py-12">
@@ -90,6 +94,20 @@ export default async function MealsPage(props: {
                         />
                     </div>
                 </div>
+            </div>
+
+            {/* Map Section */}
+            <div className="w-full h-96 rounded-xl overflow-hidden shadow-md border border-slate-200 dark:border-slate-800 mb-8 relative z-0">
+                <LeafletMapWrapper
+                    points={meals
+                        .filter((m: any) => m.latitude && m.longitude)
+                        .map((m: any) => ({
+                            lat: m.latitude,
+                            lng: m.longitude,
+                            title: m.name,
+                            description: m.cuisine
+                        }))}
+                />
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -151,10 +169,24 @@ export default async function MealsPage(props: {
                                             ))}
                                         </div>
                                     </div>
-                                </CardContent>
-                            </Card>
-                        )
-                    })
+                                </div>
+                                {/* Navigation Button */}
+                                {meal.latitude && meal.longitude && (
+                                    <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                        <a
+                                            href={`https://www.google.com/maps/dir/?api=1&destination=${meal.latitude},${meal.longitude}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-center gap-2 w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2 rounded-lg transition-colors font-medium text-sm dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50"
+                                        >
+                                            <MapPin className="h-4 w-4" />
+                                            Get Directions
+                                        </a>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    ))
                 ) : (
                     <div className="col-span-full text-center py-12 text-slate-500">
                         <p>No meals found matching your criteria.</p>
@@ -164,6 +196,6 @@ export default async function MealsPage(props: {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     )
 }

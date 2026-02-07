@@ -62,6 +62,8 @@ export async function createMeal(formData: FormData) {
         const cuisine = formData.get("cuisine") as string
         const price = formData.get("price") as string
         const locationHint = formData.get("locationHint") as string
+        const latitude = formData.get("latitude") ? parseFloat(formData.get("latitude") as string) : null
+        const longitude = formData.get("longitude") ? parseFloat(formData.get("longitude") as string) : null
 
         // Real Auth
         const user = await getCurrentUser()
@@ -82,6 +84,8 @@ export async function createMeal(formData: FormData) {
                 status: "Open Now",
                 menuItems: "Suggested Place",
                 imageClass: "bg-indigo-100",
+                latitude,
+                longitude,
                 userId: user?.id // Link to user
             }
         })
@@ -227,5 +231,120 @@ export async function updateProfile(formData: FormData) {
     } catch (error) {
         console.error("Error updating profile:", error)
         return { success: false, message: "Failed to update profile." }
+    }
+}
+
+export async function createProduct(formData: FormData) {
+    try {
+        const title = formData.get("title") as string
+        const price = parseFloat(formData.get("price") as string)
+        const description = formData.get("description") as string
+        const category = formData.get("category") as string
+
+        // Real Auth
+        const user = await getCurrentUser()
+        if (!user) {
+            return { success: false, message: "You must be logged in to sell items." }
+        }
+
+        if (!title || !price || !description) {
+            return { success: false, message: "Title, Price, and Description are required" }
+        }
+
+        await db.product.create({
+            data: {
+                title,
+                price,
+                description,
+                category: category || "General",
+                status: "Available",
+                sellerId: user.id
+            }
+        })
+
+        revalidatePath("/marketplace")
+        return { success: true, message: "Product listed successfully!" }
+    } catch (error) {
+        console.error("Error creating product:", error)
+        return { success: false, message: "Failed to list product." }
+    }
+}
+
+export async function createLostItem(formData: FormData) {
+    try {
+        const title = formData.get("title") as string
+        const description = formData.get("description") as string
+        const location = formData.get("location") as string
+        const status = formData.get("status") as string // "Lost" or "Found"
+        const contactInfo = formData.get("contactInfo") as string
+
+        // Real Auth
+        const user = await getCurrentUser()
+        if (!user) {
+            return { success: false, message: "You must be logged in to report items." }
+        }
+
+        if (!title || !description || !location || !status) {
+            return { success: false, message: "Title, Description, Location and Status are required" }
+        }
+
+        await db.lostItem.create({
+            data: {
+                title,
+                description,
+                location,
+                status,
+                contactInfo,
+                userId: user.id
+            }
+        })
+
+        revalidatePath("/lost-and-found")
+        return { success: true, message: "Item reported successfully!" }
+    } catch (error) {
+        console.error("Error reporting item:", error)
+        return { success: false, message: "Failed to report item." }
+    }
+}
+
+export async function createPost(formData: FormData) {
+    try {
+        const content = formData.get("content") as string
+
+        // Real Auth
+        const user = await getCurrentUser()
+        if (!user) {
+            return { success: false, message: "You must be logged in to post." }
+        }
+
+        if (!content) {
+            return { success: false, message: "Content cannot be empty" }
+        }
+
+        await db.post.create({
+            data: {
+                content,
+                authorId: user.id,
+                likes: 0
+            }
+        })
+
+        revalidatePath("/feed")
+        return { success: true, message: "Posted to feed!" }
+    } catch (error) {
+        console.error("Error creating post:", error)
+        return { success: false, message: "Failed to post." }
+    }
+}
+
+export async function likePost(postId: number, _formData?: FormData) {
+    try {
+        await db.post.update({
+            where: { id: postId },
+            data: { likes: { increment: 1 } }
+        })
+        revalidatePath("/feed")
+    } catch (error) {
+        console.error("Error liking post:", error)
     }
 }
