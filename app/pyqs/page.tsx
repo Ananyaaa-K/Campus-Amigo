@@ -85,7 +85,9 @@ export default async function PyqsPage(props: Props) {
                                                         <span className="text-xs text-slate-500">{pyq.semester}</span>
                                                     </div>
                                                 </div>
-                                                <Download className="h-4 w-4 text-slate-400" />
+                                                <a href={`/api/download/pyq/${pyq.id}`} className="text-slate-400 hover:text-indigo-600 transition-colors">
+                                                    <Download className="h-4 w-4" />
+                                                </a>
                                             </div>
                                         </CardContent>
                                     </Card>

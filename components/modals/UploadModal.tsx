@@ -23,20 +23,32 @@ export function UploadModal({ isOpen, onClose, type }: UploadModalProps) {
 
     const action = type === 'Note' ? createNote : createPyq
 
-    async function handleSubmit(formData: FormData) {
-        setIsLoading(true)
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        
+        setIsLoading(true);
+        
         try {
-            const result = await action(formData)
+            // Get the form data manually to ensure file is included
+            const formData = new FormData(e.currentTarget);
+            
+            // Get the file input element by its ID
+            const fileInput = document.getElementById(`file-input-${type}`) as HTMLInputElement;
+            if (fileInput && fileInput.files && fileInput.files[0]) {
+                formData.set('file', fileInput.files[0]);
+            }
+            
+            const result = await action(formData);
             if (result?.success) {
-                toast.success(result.message)
-                onClose()
+                toast.success(result.message);
+                onClose();
             } else {
-                toast.error(result?.message || "Upload failed")
+                toast.error(result?.message || "Upload failed");
             }
         } catch (error) {
-            toast.error("Something went wrong")
+            toast.error("Something went wrong");
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
@@ -54,15 +66,32 @@ export function UploadModal({ isOpen, onClose, type }: UploadModalProps) {
                     <CardDescription>Share your resources with the community.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <form action={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         <div
                             className={cn(
                                 "border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center transition-colors cursor-pointer",
                                 isDragOver ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20" : "border-slate-200 dark:border-slate-700"
                             )}
+                            onClick={() => document.getElementById(`file-input-${type}`)?.click()}
                             onDragOver={(e) => { e.preventDefault(); setIsDragOver(true) }}
                             onDragLeave={() => setIsDragOver(false)}
-                            onDrop={(e) => { e.preventDefault(); setIsDragOver(false) }}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                setIsDragOver(false);
+                                
+                                // Handle dropped file
+                                const files = e.dataTransfer.files;
+                                if (files.length > 0) {
+                                    const fileInput = document.getElementById(`file-input-${type}`) as HTMLInputElement;
+                                    if (fileInput) {
+                                        // Create a new FileList-like object to set the files
+                                        // We'll use a workaround by triggering a change event
+                                        const event = new Event('change', { bubbles: true });
+                                        fileInput.files = files;
+                                        fileInput.dispatchEvent(event);
+                                    }
+                                }
+                            }}
                         >
                             <div className="bg-indigo-100 p-3 rounded-full mb-3 dark:bg-indigo-900/50">
                                 <UploadCloud className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
@@ -73,6 +102,35 @@ export function UploadModal({ isOpen, onClose, type }: UploadModalProps) {
                             <p className="text-xs text-slate-500 mt-1">
                                 PDF, DOCX up to 10MB
                             </p>
+                            <input
+                                id={`file-input-${type}`}
+                                type="file"
+                                name="file"
+                                accept=".pdf,.doc,.docx"
+                                className="hidden"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        console.log('File selected:', e.target.files[0].name);
+                                        // Update the UI to show selected file
+                                        const fileNameElement = document.createElement('div');
+                                        fileNameElement.className = 'text-xs text-indigo-600 mt-2';
+                                        fileNameElement.textContent = `Selected: ${e.target.files[0].name}`;
+                                        
+                                        // Find the container and update it
+                                        const container = e.target.closest('div')?.parentElement;
+                                        if (container) {
+                                            // Remove any existing file name element
+                                            const existingFileName = container.querySelector('.file-name-display');
+                                            if (existingFileName) {
+                                                existingFileName.remove();
+                                            }
+                                            
+                                            fileNameElement.className += ' file-name-display';
+                                            container.appendChild(fileNameElement);
+                                        }
+                                    }
+                                }}
+                            />
                         </div>
 
                         <div className="space-y-3">

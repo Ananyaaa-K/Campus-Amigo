@@ -45,3 +45,11 @@ next-env.d.ts
 *.db-journal
 *.sqlite
 *.sqlite-journal
+
+node_modules/
+.env
+.vscode/
+venv/
+dist/
+build/
+public/uploads/

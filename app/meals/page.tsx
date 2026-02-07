@@ -46,8 +46,13 @@ export default async function MealsPage(props: {
     try {
         meals = await db.meal.findMany({
             where,
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' },
+            take: 6  // Limit to 6 meals
         })
+        console.log('Meals fetched:', meals.length)
+        if (meals.length > 0) {
+            console.log('First meal:', JSON.stringify(meals[0], null, 2))
+        }
     } catch (error) {
         console.error("Failed to fetch meals:", error)
     }
@@ -108,6 +113,7 @@ export default async function MealsPage(props: {
                                             fill
                                             className="object-cover"
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                            unoptimized
                                         />
                                     ) : (
                                         <div className={`h-full w-full ${meal.imageClass || 'bg-slate-200'}`} />
