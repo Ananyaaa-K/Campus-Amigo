@@ -1,5 +1,4 @@
-
-
+import Image from "next/image"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Coffee, MapPin, Star, Clock } from "lucide-react"
@@ -115,13 +114,13 @@ export default async function MealsPage(props: {
                     meals.map((meal: any) => {
                         const menuItemsArray = meal.menuItems.split(',').map((item: string) => item.trim())
                         const itemPricesArray = meal.itemPrices ? meal.itemPrices.split(',').map((price: string) => price.trim()) : []
-                        
+
                         return (
                             <Card key={meal.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                                 <div className="h-48 w-full relative">
                                     {meal.imageUrl ? (
-                                        <Image 
-                                            src={meal.imageUrl} 
+                                        <Image
+                                            src={meal.imageUrl}
                                             alt={meal.name}
                                             fill
                                             className="object-cover"
@@ -169,7 +168,7 @@ export default async function MealsPage(props: {
                                             ))}
                                         </div>
                                     </div>
-                                </div>
+                                </CardContent>
                                 {/* Navigation Button */}
                                 {meal.latitude && meal.longitude && (
                                     <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
@@ -184,9 +183,9 @@ export default async function MealsPage(props: {
                                         </a>
                                     </div>
                                 )}
-                            </CardContent>
-                        </Card>
-                    ))
+                            </Card>
+                        )
+                    })
                 ) : (
                     <div className="col-span-full text-center py-12 text-slate-500">
                         <p>No meals found matching your criteria.</p>

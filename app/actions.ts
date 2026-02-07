@@ -348,3 +348,22 @@ export async function likePost(postId: number, _formData?: FormData) {
         console.error("Error liking post:", error)
     }
 }
+
+export async function submitQuery(formData: FormData) {
+    try {
+        const title = formData.get("title") as string
+        const content = formData.get("content") as string
+
+        await db.query.create({
+            data: {
+                title,
+                content
+            }
+        })
+
+        return { success: true, message: "Query submitted successfully!" }
+    } catch (error) {
+        console.error("Error submitting query:", error)
+        return { success: false, message: "Failed to submit query." }
+    }
+}

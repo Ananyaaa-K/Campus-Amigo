@@ -133,3 +133,10 @@ model Review {
   user      User     @relation(fields: [userId], references: [id])
   userId    String
 }
+
+model Query {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+}
