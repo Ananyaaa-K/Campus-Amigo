@@ -105,12 +105,12 @@ export default async function NotesPage(props: {
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <div className="hidden text-right sm:block">
-                                        <p className="text-sm font-medium text-slate-900 dark:text-slate-200">{note.size}</p>
-                                        <p className="text-xs text-slate-500">{note.downloads} downloads</p>
+                                        <p className="text-sm font-medium text-slate-900 dark:text-slate-200">{note.fileType}</p>
+                                        <p className="text-xs text-slate-500">{note.size} • {note.downloads} downloads</p>
                                     </div>
-                                    <Button variant="ghost" size="icon" className="h-10 w-10 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30">
+                                    <a href={`/api/download/note/${note.id}`} className="text-indigo-600 hover:text-indigo-800 transition-colors">
                                         <Download className="h-5 w-5" />
-                                    </Button>
+                                    </a>
                                 </div>
                             </CardContent>
                         </Card>

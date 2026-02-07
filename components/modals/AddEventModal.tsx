@@ -10,18 +10,40 @@ export function AddEventModal() {
     const [isOpen, setIsOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
-    async function handleSubmit(formData: FormData) {
-        setIsLoading(true)
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        console.log("Form submitted!");
+        
+        // Get form data manually
+        const title = (e.currentTarget.elements.namedItem("title") as HTMLInputElement)?.value;
+        const date = (e.currentTarget.elements.namedItem("date") as HTMLInputElement)?.value;
+        const location = (e.currentTarget.elements.namedItem("location") as HTMLInputElement)?.value;
+        const description = (e.currentTarget.elements.namedItem("description") as HTMLTextAreaElement)?.value;
+        
+        console.log("Manual form data:", { title, date, location, description });
+        
+        setIsLoading(true);
         try {
-            const result = await createEvent(formData)
+            const formData = new FormData(e.currentTarget);
+            console.log("FormData object:", {
+                title: formData.get("title"),
+                date: formData.get("date"),
+                location: formData.get("location"),
+                description: formData.get("description")
+            });
+            const result = await createEvent(formData);
+            console.log("Create event result:", result);
             if (result?.success) {
-                toast.success(result.message)
-                setIsOpen(false)
+                toast.success(result.message);
+                setIsOpen(false);
             } else {
-                toast.error(result?.message || "Failed to create event")
+                toast.error(result?.message || "Failed to create event");
             }
+        } catch (error) {
+            console.error("Error in handleSubmit:", error);
+            toast.error("Something went wrong");
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
@@ -40,7 +62,7 @@ export function AddEventModal() {
                     <h2 className="text-xl font-bold mb-1">Host an Event</h2>
                     <p className="text-sm text-slate-500 mb-6">Share details about your upcoming activity.</p>
 
-                    <form action={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Event Title</label>
                             <div className="relative">
@@ -93,7 +115,16 @@ export function AddEventModal() {
                             <Button type="button" variant="ghost" className="flex-1" onClick={() => setIsOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit" className="flex-1" disabled={isLoading}>
+                            <Button 
+                                type="submit" 
+                                className="flex-1" 
+                                disabled={isLoading}
+                                onClick={(e) => {
+                                    console.log("Publish button clicked");
+                                    console.log("Event target:", e.target);
+                                    console.log("Current target:", e.currentTarget);
+                                }}
+                            >
                                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Publish Event"}
                             </Button>
                         </div>
